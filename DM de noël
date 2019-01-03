@@ -1,0 +1,72 @@
+#!/bin/bash
+
+#Script Bash
+#Auteur	: Alexande FABRE
+#Date	: 30/12/2018
+#Objet	: DM de Noël
+
+#Déclaration des variables (optionnel)
+	maximum=0
+	minimum=0
+	hasard=0
+	compteur=0
+	positionseparateur=0
+	pays=""
+	capitale=""
+	erreur=0
+
+#Obtention d'un nombre aléatoire entre les valeurs minimums et maximum
+	maximum=197
+	minimum=1
+	hasard=$((minimum+RANDOM*(1+maximum-minimum)/32767))
+
+
+#Lecture du fichier jusqu'à la ligne désignée par le nombre aléatoire et mémorisation de la ligne
+	compteur=1
+	while read ligne #Tant que une ligne peut être lue
+		do
+			if [ $compteur -eq $hasard ]; then #si le numéro de la ligne lue est égal au nombre aléatoire
+				maligne=$ligne #On mémorise la ligne
+			fi
+			compteur=$((compteur+1)) #On incrémente le compteur de ligne
+		done < capitales.txt #le fichier 'capitales.txt' est chargé dans la boucle du while
+
+#Remplacement du séparateur ' -- ' par ';' afin de décoder la chaine plus simplement
+	maligne=${maligne/ -- /;}
+
+
+#Détection de la position du séparateur ';' dans la chaine
+	positionseparateur=`expr index "$maligne" ';'`
+
+#Mémorisation des sous-chaines 'capitale' et 'ville' en fonction de la position du séparateur
+	capitale=${maligne:$((positionseparateur))}
+	pays=${maligne:0:$((positionseparateur-1))}
+	
+
+#Interface utilisateur du jeu
+	if [ "$1" == "cheat" ]; then    	#si le paramètre passé en ligne de commande est 'cheat' 
+		echo
+		echo "Capitale : $capitale"	#alors on affiche la Capitale
+ 	fi
+
+	while [ $erreur -lt 5 ]; do # tant que l'utilisateur n'a pas fait 5 tentatives
+		echo
+		echo "Veuillez trouver la capitale du pays : $pays"
+		echo
+		read reponse
+		if [[ "$reponse" == "$capitale" ]]; then #Si l'utilisateur trouve la bonne réponse
+			echo
+        		echo "Bravo tu as gagné !!"
+			erreur=5
+		else #Si l'utilisateur ne trouve pas la bonne réponse
+			echo
+			echo "Mauvaise reponse... Il ne te reste que $((4-$erreur)) essai(s)... Essaye encore!"
+			erreur=$((erreur+1))
+		fi
+	done
+	echo
+	echo "Partie terminée"
+	echo
+
+
+#Fin du Script
